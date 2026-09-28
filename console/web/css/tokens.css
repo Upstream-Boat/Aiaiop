@@ -1,0 +1,61 @@
+/* 设计令牌 —— 深色指挥台。
+   层次只有一条线：画布 → 卡片 → 内嵌 → 悬浮；强调色只有一个（信号绿），
+   其余颜色只在表达状态时出现。视图样式一律引用变量，不写死色值。 */
+
+:root {
+  color-scheme: dark;
+
+  /* 表面：画布 / 卡片 / 内嵌 / 悬浮 / 更亮 */
+  --bg: #070a10;
+  --bg-1: #0c121a;
+  --bg-2: #111a24;
+  --bg-3: #17222f;
+  --bg-4: #1e2b3b;
+  --line: #1a2432;
+  --line-2: #26333f;
+
+  /* 文本三级：标题 / 正文 / 说明 */
+  --text: #e9f0f8;
+  --text-2: #9db0c5;
+  --text-3: #6b7d92;
+
+  /* 状态色：--*-dim 是低透明底，--*-line 是描边。 */
+  --signal: #3ddba9;  --signal-dim: rgba(61, 219, 169, .12);  --signal-line: rgba(61, 219, 169, .38);
+  --info: #4da3ff;    --info-dim: rgba(77, 163, 255, .12);    --info-line: rgba(77, 163, 255, .38);
+  --warn: #f2b13f;    --warn-dim: rgba(242, 177, 63, .12);    --warn-line: rgba(242, 177, 63, .38);
+  --danger: #ff5f70;  --danger-dim: rgba(255, 95, 112, .12);  --danger-line: rgba(255, 95, 112, .38);
+  --violet: #a58bfa;  --violet-dim: rgba(165, 139, 250, .12);
+
+  /* 品牌渐变：只用在标识、激活条这类小面积上 */
+  --brand-grad: linear-gradient(140deg, #3ddba9 0%, #3fb9ff 100%);
+  --surface-grad: linear-gradient(180deg, rgba(255, 255, 255, .022), rgba(255, 255, 255, 0) 62%);
+
+  /* 字体：界面用系统无衬线，数字与代码用等宽 */
+  --font: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 圆角、描边高光、阴影 */
+  --r-xs: 5px;
+  --r-sm: 7px;
+  --r: 10px;
+  --r-lg: 14px;
+  --r-full: 999px;
+  --hair: inset 0 1px 0 rgba(255, 255, 255, .035);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 26px rgba(0, 0, 0, .3);
+  --shadow-pop: 0 10px 34px rgba(0, 0, 0, .5);
+
+  /* 间距节奏 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* 结构尺寸 */
+  --nav-w: 236px;
+  --topbar-h: 64px;
+
+  --ease: cubic-bezier(.4, 0, .2, 1);
+}

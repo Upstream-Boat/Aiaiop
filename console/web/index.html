@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="console">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>工具管理台</title>
+  <!-- 样式分层：令牌 -> 基础 -> 布局 -> 组件 -> 各视图 -->
+  <link rel="stylesheet" href="css/tokens.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/base.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/layout.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/components.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/views/tasks.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/views/tools.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/views/rules.css?v2026-09-28.1" />
+  <link rel="stylesheet" href="css/views/audit.css?v2026-09-28.1" />
+</head>
+<body>
+  <div id="app"></div>
+  <!-- 运行时本地自带：离线环境不依赖 CDN -->
+  <!-- 所有本地资源都带 ?v= 版本号：浏览器一旦认定某个 JS "还新鲜"，
+       普通刷新根本不会重新请求它，就会出现"修好了但你看还是坏的"。
+       版本号换了 URL 就变了，浏览器没有复用缓存的余地。改前端请同步改这里。 -->
+  <script src="vendor/vue.global.prod.js?v2026-09-28.1"></script>
+  <script src="js/api.js?v2026-09-28.1"></script>
+  <script src="js/events.js?v2026-09-28.1"></script>
+  <script src="js/format.js?v2026-09-28.1"></script>
+  <script src="js/router.js?v2026-09-28.1"></script>
+  <script src="js/views/tasks.js?v2026-09-28.1"></script>
+  <script src="js/views/tools.js?v2026-09-28.1"></script>
+  <script src="js/views/rules.js?v2026-09-28.1"></script>
+  <script src="js/views/audit.js?v2026-09-28.1"></script>
+  <script src="js/app.js?v2026-09-28.1"></script>
+</body>
+</html>

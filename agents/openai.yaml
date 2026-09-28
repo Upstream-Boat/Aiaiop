@@ -1,0 +1,6 @@
+interface:
+  display_name: "sec-assessment 渗透与安全扫描"
+  short_description: "43 个本地渗透测试与安全扫描工具的模块化复刻"
+  default_prompt: "使用 $sec-assessment 对已授权目标做一次完整的资产发现与漏洞扫描，并按 kill-chain 阶段输出结论。"
+policy:
+  allow_implicit_invocation: true

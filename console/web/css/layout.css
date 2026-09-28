@@ -1,0 +1,165 @@
+/* 布局骨架 —— 左侧导航 + 主区（页头 + 视图）；任务台视图内部再分三栏。 */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--nav-w) 1fr;
+  /* 行高锁死为容器高度。只写 height:100% 不够：隐式行是 auto，会被内容撑高，
+     内部 .workbench 的 height:100% 就退化成 auto，三栏一起变高、整页滚动。 */
+  grid-template-rows: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── 左侧导航 ── */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sp-4) var(--sp-3) var(--sp-3);
+  background: linear-gradient(180deg, #0c121a 0%, #090e15 100%);
+  border-right: 1px solid var(--line);
+  min-height: 0;          /* 允许在栅格行内收缩 */
+  overflow-y: auto;       /* 导航项多时自己滚，不撑高整页 */
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 2px 6px var(--sp-4);
+}
+
+.nav-logo {
+  width: 32px; height: 32px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 9px;
+  background: var(--brand-grad);
+  color: #05231b;
+  box-shadow: 0 4px 14px rgba(61, 219, 169, .22);
+}
+.nav-logo svg { width: 18px; height: 18px; }
+
+.nav-id { min-width: 0; display: flex; flex-direction: column; }
+.nav-id b { font-size: 13.5px; font-weight: 600; letter-spacing: .2px; line-height: 1.35; }
+.nav-id i { font-style: normal; font-size: 11px; color: var(--text-3); line-height: 1.4; }
+
+/* 页签一条线排开、不分组：只剩下四页的时候，"观测 / 留痕"这类分组标题
+   只是一行占地方的灰字，还容易让人以为审计链和别的东西不是一套。 */
+.nav-list {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-top: 12px;
+}
+
+.nav-item {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 8px 10px;
+  border-radius: var(--r);
+  color: var(--text-2); font-size: 13px; text-align: left;
+  transition: background 140ms var(--ease), color 140ms var(--ease);
+}
+.nav-item .ico { width: 17px; height: 17px; flex: none; opacity: .72; transition: opacity 140ms var(--ease); }
+.nav-item .ico svg { width: 100%; height: 100%; display: block; }
+.nav-item .label { flex: 1; min-width: 0; }
+
+.nav-item:hover { background: var(--bg-2); color: var(--text); }
+.nav-item:hover .ico { opacity: 1; }
+
+.nav-item.active { background: var(--bg-3); color: var(--text); box-shadow: var(--hair); }
+.nav-item.active::before {
+  content: ""; position: absolute; left: -1px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 16px; border-radius: 0 3px 3px 0; background: var(--signal);
+}
+.nav-item.active .ico { opacity: 1; color: var(--signal); }
+
+.nav-foot {
+  margin-top: auto;
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--bg-1);
+  font-size: 11px; color: var(--text-3);
+}
+.nav-foot .line { display: flex; align-items: center; gap: 7px; }
+/* 运行时目录是长路径且含中文，默认换行会在汉字之间断开，看起来像乱码。
+   统一 break-all 整齐折行，最多两行。 */
+.nav-foot .path {
+  font-family: var(--mono); font-size: 10.5px; line-height: 1.45;
+  word-break: break-all;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nav-foot .split { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.nav-foot .hr { height: 1px; background: var(--line); }
+
+/* 在线指示灯 */
+.live-dot {
+  width: 6px; height: 6px; flex: none; border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-dim);
+}
+.live-dot.off { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-dim); }
+/* 中性态：不表示"出错了"，只表示"现在没有动静" */
+.live-dot.mute { background: var(--text-3); box-shadow: 0 0 0 3px rgba(107, 125, 146, .14); }
+
+/* ── 主区 ── */
+.main {
+  display: flex; flex-direction: column;
+  min-width: 0;
+  min-height: 0;          /* 栅格项默认 min-height:auto，会被内容顶开 */
+  overflow: hidden;       /* 滚动交给内部的 .view */
+}
+
+/* 页头：当前页的身份 + 全局状态。不再是空条。 */
+.topbar {
+  height: var(--topbar-h); flex: none;
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 0 22px;
+  background: rgba(12, 18, 26, .72);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar .page-ico {
+  width: 34px; height: 34px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--signal);
+}
+.topbar .page-ico svg { width: 18px; height: 18px; display: block; }
+
+.topbar .page-id { display: flex; align-items: center; min-width: 0; }
+.topbar .page-id h1 { font-size: 16px; line-height: 1.35; }
+
+.view {
+  flex: 1; min-height: 0;
+  overflow: auto;
+  padding: 20px 22px 26px;
+}
+
+/* ── 任务台：任务列表 | 执行看板 | 洞察 ── */
+.workbench {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr) 320px;
+  gap: var(--sp-4);
+  height: 100%;
+  min-height: 0;
+}
+
+.wb-col { display: flex; flex-direction: column; min-height: 0; gap: var(--sp-4); }
+
+@media (max-width: 1440px) {
+  .workbench { grid-template-columns: 244px minmax(0, 1fr) 288px; }
+}
+
+/* 窄屏（笔记本投屏常见 1280）退化为两栏，洞察列折到下方 */
+@media (max-width: 1280px) {
+  .workbench { grid-template-columns: 232px minmax(0, 1fr); }
+  .wb-insight { grid-column: 1 / -1; flex-direction: row; }
+  .wb-insight > .card { flex: 1; min-width: 0; }
+}
+
+@media (max-width: 1100px) {
+  :root { --nav-w: 200px; }
+  .view { padding: 16px; }
+}

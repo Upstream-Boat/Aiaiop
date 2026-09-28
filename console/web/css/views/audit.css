@@ -1,0 +1,37 @@
+/* 视图：审计链 —— 校验结论 + 记录时间线。
+   演示要点：先校验全绿，再点篡改，同一页立刻标红。
+   记录时间线用的 .chain / .chain-row 是通用组件（任务台也在用），在 components.css。 */
+
+/* 结论指标紧贴表头，用一条分隔线收口 */
+.audit-strip { border-bottom: 1px solid var(--line); }
+
+.verify-panel { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+.finding-line {
+  padding: 7px 10px; border-radius: var(--r-sm);
+  background: var(--bg-2); font-size: 12px; line-height: 1.6;
+}
+.finding-line.bad { background: var(--danger-dim); color: var(--danger); }
+
+/* 记录条目：哈希行与详情行都比通用链条目再松一点，200 条也不挤 */
+.chain-row .top { flex-wrap: wrap; }
+
+/* 记录条目：分类标签 + 失败高亮。失败那一条整行是红的，别让人翻 200 行找 */
+.chain-row .top .tag { flex: none; }
+.chain-row .detail.bad { color: var(--danger); }
+.chain { padding-bottom: 4px; }
+
+/* 整页按视口收尾：上面的校验卡高度自适应，下面那张记录卡吃满剩下的高度，
+   记录在里面自己滚 —— 分页条钉在卡片底部，翻页不用先滑到页面最底下。 */
+.audit-page { display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
+.audit-page > .card { min-height: 0; }
+.audit-page > .card > .pager {
+  flex: none; padding: 10px 14px 11px;
+  border-top: 1px solid var(--line);
+}
+
+.pager { display: flex; align-items: center; gap: var(--sp-2); padding-bottom: 10px; }
+.pager .pg { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pager .pg b { font-family: var(--mono); font-size: 12.5px; color: var(--text); }
+/* 列表下面那条（窄屏整页滚的时候用得上）：与列表之间拉一条线收口 */
+.chain + .pager { padding: 10px 0 0; margin-top: 2px; border-top: 1px solid var(--line); }

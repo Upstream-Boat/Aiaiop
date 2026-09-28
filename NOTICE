@@ -1,0 +1,18 @@
+sec-assessment
+Copyright 2026 指尖未来（北京）信息技术有限公司
+
+本产品包含由第三方提供的软件与数据，各自遵循其原始许可证：
+
+  - data/exploit-db/             Exploit-DB（Offensive Security），见该目录下 LICENSE
+  - data/nuclei-templates/       Nuclei Templates（ProjectDiscovery），见该目录下 LICENSE
+  - data/cve_cache_sm_por.sqlite 由 NVD 公开数据（NIST）构建，NVD 数据为美国政府公开数据
+  - data/oui/nmap-mac-prefixes   Nmap MAC 前缀表（Nmap Project）
+
+第三方许可全文随各自目录分发；再分发前请复核上游条款。
+
+
+使用限制与免责
+
+本项目仅可用于已获授权目标的安全评估。严禁用于未授权扫描、入侵控制、数据窃取或
+任何违法用途。使用者自负其责；作者与贡献者不承担由此产生的任何后果与法律责任。
+本项目按 Apache-2.0「现状」提供，不含任何明示或默示担保。

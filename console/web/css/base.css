@@ -1,0 +1,85 @@
+/* 基础排版与复位 —— 只做全局约定，不含组件样式。 */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.6 var(--font);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  /* 两处极淡的径向光：一抹绿定调、一抹蓝补冷，避免整屏死黑 */
+  background-image:
+    radial-gradient(900px 420px at 12% -8%, rgba(61, 219, 169, .075), transparent 68%),
+    radial-gradient(760px 380px at 92% -12%, rgba(63, 185, 255, .06), transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+#app { height: 100%; }
+
+a { color: var(--info); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+code, .mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+::selection { background: rgba(61, 219, 169, .26); }
+:focus-visible { outline: 2px solid var(--signal-line); outline-offset: 2px; border-radius: var(--r-xs); }
+
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #223043;
+  border-radius: var(--r-full);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: #31435a; background-clip: content-box; }
+
+/* 标题层级 */
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: .2px; }
+h1 { font-size: 17px; }
+h2 { font-size: 15px; }
+h3 { font-size: 13px; }
+
+/* 文本语气 */
+.muted { color: var(--text-3); }
+.dim { color: var(--text-2); }
+.ok-text { color: var(--signal); }
+.bad-text { color: var(--danger); }
+.warn-text { color: var(--warn); }
+.small { font-size: 12px; }
+.tiny { font-size: 11px; }
+
+/* 排布工具类 */
+.grow { flex: 1; min-width: 0; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nowrap { white-space: nowrap; }
+.row { display: flex; align-items: center; gap: var(--sp-2); }
+.col { display: flex; flex-direction: column; }
+.wrap { flex-wrap: wrap; }
+
+/* 视图内容的统一竖向节奏 */
+.page { display: flex; flex-direction: column; gap: var(--sp-4); min-height: 0; }
+.page.fill { height: 100%; }
+.page.fill > .fill { flex: 1; min-height: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}

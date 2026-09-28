@@ -1,0 +1,20 @@
+# 规则库载荷（约 1GB，按需下载，见 data/README.md）
+data/cve_cache_sm_por.sqlite
+data/exploit-db/
+data/nuclei-templates/
+
+# 运行时产物（任务轨迹 / 审计链 / 报告）
+data/runtime/
+
+# 凭据（绝不入库）
+data/nvd_api_key.txt
+*.key
+*.pem
+
+# Python / 编辑器
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+.idea/
+.vscode/

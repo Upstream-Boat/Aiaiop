@@ -1,0 +1,237 @@
+/* 视图：任务台 —— 以"工具"为主轴：
+   左 工具索引（哪些工具被用过）/ 中 调用流水（这个工具被调了几次、结果如何）/
+   右 这一次调用（参数 + 原始输出）+ 它属于哪次任务。
+   这里没有输入框：控制台只显示执行，不下达任务。 */
+
+/* 版面：左（工具索引）+ 中（输入与输出）并排占左边一大块；右栏贯通两行。
+   顶部那条"此刻在跑"只铺到中栏的右缘为止 —— 铺满整宽的话，右栏就只能在它下面
+   排队，三张卡被压成一溜；断在这儿，右栏能顶到页顶，高度一下多出一整条横条。 */
+.task-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 356px;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: "hero side" "main side";
+  gap: var(--sp-4);
+  height: 100%; min-height: 0;
+}
+.live-hero { grid-area: hero; }
+.task-main { grid-area: main; }
+.task-side { grid-area: side; }
+
+/* ── 顶栏：此刻在跑 ── */
+.live-hero { overflow: hidden; }
+.hero-top { display: flex; align-items: center; gap: var(--sp-3); padding: 13px 16px 12px; }
+.hero-title { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.35; }
+.hero-title b { font-weight: 600; color: var(--warn); }
+.hero-title.idle { color: var(--text-2); font-weight: 500; }
+.hero-sub {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-top: 4px; font-size: 11.5px; color: var(--text-3);
+}
+.hero-sub i { font-style: normal; opacity: .5; }
+.hero-sub .ellipsis { max-width: 460px; }
+.hero-tick { text-align: right; flex: none; }
+.hero-tick .v { font-size: 19px; font-weight: 500; color: var(--warn); font-variant-numeric: tabular-nums; }
+.hero-tick .k { font-size: 11px; color: var(--text-3); }
+
+/* 四格口径 + 统计范围：把"这些数字怎么来的"写在旁边 */
+.live-strip {
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: 11px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.live-strip .stat .v { font-size: 17px; }
+.live-strip .stat .v.bad { color: var(--danger); }
+.live-strip .scope { font-size: 11px; color: var(--text-3); }
+
+/* ── 左 + 中 ── */
+.task-main {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  gap: var(--sp-4);
+  min-height: 0;
+}
+.task-main > * { min-height: 0; }
+.task-side { display: flex; flex-direction: column; gap: var(--sp-4); min-height: 0; }
+
+/* 左：工具索引 —— 只列被调用过的工具，按最近调用时间排序。
+   卡片头很窄：标题 + 三个筛选按钮，按钮一律不许换行，否则会被挤成两行叠字。 */
+.tool-index .card-head { flex-wrap: nowrap; gap: var(--sp-2); }
+.tool-index .card-head .title { white-space: nowrap; }
+.tool-index .seg button { white-space: nowrap; padding: 4px 7px; }
+.tool-list {
+  flex: 1; min-height: 0; overflow: auto;
+  padding: 6px; display: flex; flex-direction: column; gap: 3px;
+}
+.tool-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  width: 100%; text-align: left;
+  padding: 9px 10px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  transition: background 120ms var(--ease), border-color 120ms var(--ease);
+}
+.tool-item:hover { background: var(--bg-2); }
+.tool-item.active { background: var(--bg-3); border-color: var(--line-2); box-shadow: var(--hair); }
+.tool-item.active .name { color: var(--signal); }
+.tool-item .name { font-size: 12.5px; color: var(--text); }
+.tool-item .n { font-size: 12px; color: var(--text-2); }
+.tool-item .row { display: flex; align-items: center; gap: 6px; }
+.tool-item .tag { flex: none; margin-top: 1px; }
+.tool-item .live-dot { margin-top: 5px; }
+/* "已跑 12s"：跑着的工具在左栏也要看得出跑了多久 */
+.tool-item .warn-text { color: var(--warn); }
+
+/* 右：调用流水。一列小行：时间 + 第几步 + 结果 + 耗时，下面一行是参数摘要 */
+.flow-card { display: flex; flex-direction: column; flex: 1.3; min-height: 0; }
+.flow-body {
+  flex: 1; min-height: 0; overflow: auto;
+  padding: 6px; display: flex; flex-direction: column; gap: 3px;
+}
+.call-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  width: 100%; text-align: left;
+  padding: 7px 9px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  transition: background 120ms var(--ease), border-color 120ms var(--ease);
+}
+.call-row:hover { background: var(--bg-2); }
+.call-row.sel { background: var(--bg-3); border-color: var(--line-2); box-shadow: var(--hair); }
+.call-row.sel .t { color: var(--signal); }
+.call-row.live { background: var(--warn-dim); border-color: var(--warn-line); }
+.call-row .row { display: flex; align-items: center; gap: 6px; }
+.call-row .t { font-size: 11.5px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.call-row .dur { color: var(--text-3); font-variant-numeric: tabular-nums; }
+.call-row .tag { flex: none; padding: 1px 5px; font-size: 10.5px; }
+.call-row .grow > .tiny { margin-top: 3px; }
+/* 每条流水下面那句结果摘要：颜色跟结果走，扫一眼就知道这条成了没、出了什么 */
+.call-row .summary-line { color: var(--text-3); max-width: 100%; }
+.call-row .summary-line.ok { color: var(--text-2); }
+.call-row .summary-line.warn { color: var(--warn); }
+.call-row .summary-line.bad { color: var(--danger); }
+.call-row .summary-line.live { opacity: .95; }
+/* 删掉这条流水：默认不显眼，鼠标落到这行才出现（不挡着看结果）。
+   一行流水是两行文字，按钮自己居中 —— 否则会吊在第一行顶上，看着像没对齐。 */
+.row-x {
+  flex: none; align-self: center; display: flex;
+  opacity: 0; padding: 4px; border-radius: var(--r-xs);
+  color: var(--text-3);
+  transition: opacity 120ms var(--ease), color 120ms var(--ease), background 120ms var(--ease);
+}
+.row-x:disabled { cursor: default; }
+.row-x svg { width: 15px; height: 15px; display: block; }
+.call-row:hover .row-x, .call-row:focus-visible .row-x { opacity: 1; }
+.row-x:hover { color: var(--danger); background: var(--danger-dim); }
+/* 状态点：颜色跟结果走，不看文字也能扫出哪几条是坏的 */
+.call-row .st, .tool-item > .live-dot { flex: none; }
+.call-row .st { margin-top: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.call-row .st.ok { background: var(--signal); box-shadow: 0 0 0 3px var(--signal-dim); }
+.call-row .st.bad { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-dim); }
+.call-row .st.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-dim); }
+.call-row .st.info { background: var(--info, var(--text-3)); }
+
+/* 页脚：控制台不下达任务 + 授权边界（安全类 skill 演示必须留着） */
+.howto-foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--sp-3);
+  font-size: 11px; color: var(--text-3);
+}
+.howto-foot .mono {
+  color: var(--text-2); background: var(--bg);
+  border: 1px solid var(--line); border-radius: var(--r-xs); padding: 1px 6px;
+}
+
+/* 中：输入与输出。这一页的主角，给足高度，输出自己滚 */
+.detail-card { min-height: 0; display: flex; flex-direction: column; }
+/* 这一张卡里只有两个框：输入、输出。滚动条只允许出现在"输出"里面 ——
+   外层 .card-body 默认是 overflow:auto，再配上输出框自己的滚动，就成了
+   一个卡里两条滚动条，框还没对齐。这里把外层关掉，高度全交给下面两个框分。 */
+.detail-card > .card-body { overflow: hidden; }
+.detail-body { display: flex; flex-direction: column; gap: 8px; min-height: 0; flex: 1; }
+.detail-params {
+  flex: none;
+  padding: 8px 10px;
+  /* 参数只有几行，给个上限就够；真超了在自己框里滚，不去挤下面的输出 */
+  max-height: 132px; overflow: auto;
+  border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--bg);
+}
+.detail-params .mono { margin-top: 2px; word-break: break-all; color: var(--text-2); }
+/* 输出框把输入框剩下的高度全部吃掉：不高不矮，恰好填满这张卡。
+   给 min-height 会撑破卡片、逼出外层滚动条；给死高又会在矮屏上被裁掉，
+   所以让它 flex:1 跟着卡片走，长内容在它自己里面滚。 */
+.detail-log { flex: 1; min-height: 0; font-size: 12.5px; }
+/* 跑着的输出：左边一条黄线，提示"这里还在长"，跟其他灰框区分开 */
+.detail-log.running { border-color: var(--warn-line); background: var(--warn-dim); }
+
+.run-title { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.run-sub {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--text-3);
+}
+.run-sub b { font-weight: 500; color: var(--text-2); }
+.run-sub i { font-style: normal; opacity: .5; }
+.run-sub .mono { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+.side-chain { flex: 1; min-height: 0; }
+
+/* ── 所属任务里的"执行情况"：整轮步骤 + 每步状态 ──
+   高度封顶自己滚：右栏是贯通到页底的一列，内容长了不能把版面顶开。 */
+.run-steps { display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+.run-steps .steps-head {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: 11px; color: var(--text-3);
+}
+.run-steps .steps-bar { display: flex; gap: 3px; }
+.run-steps .steps-bar .seg {
+  flex: 1; height: 4px; border-radius: var(--r-full); background: var(--bg-3);
+}
+.run-steps .steps-bar .seg.done { background: var(--signal); }
+.run-steps .steps-bar .seg.running { background: var(--warn); }
+.run-steps .steps-bar .seg.failed, .run-steps .steps-bar .seg.blocked { background: var(--danger); }
+.run-steps .steps-list {
+  display: flex; flex-direction: column; gap: 1px;
+  max-height: 148px; overflow: auto;
+}
+.run-steps .step-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 3px 0; font-size: 11.5px; color: var(--text-2);
+}
+.run-steps .step-row .n { color: var(--text-3); width: 12px; flex: none; text-align: right; }
+.run-steps .step-row .tool { max-width: 132px; }
+.run-steps .step-row.running .tool { color: var(--warn); font-weight: 500; }
+.run-steps .step-row.todo .tool { color: var(--text-3); }
+.run-steps .step-row.failed .tool, .run-steps .step-row.blocked .tool { color: var(--danger); }
+.run-steps .step-row .tag { flex: none; padding: 1px 5px; font-size: 10.5px; }
+
+/* 窄一点：三块一起收，还是一屏装得下 */
+@media (max-width: 1560px) {
+  .task-page { grid-template-columns: minmax(0, 1fr) 324px; }
+  .task-main { grid-template-columns: 248px minmax(0, 1fr); }
+}
+@media (max-width: 1360px) {
+  .task-page { grid-template-columns: minmax(0, 1fr) 300px; }
+  .task-main { grid-template-columns: 236px minmax(0, 1fr); }
+}
+@media (max-width: 1180px) {
+  .task-page { grid-template-columns: minmax(0, 1fr) 272px; }
+  .task-main { grid-template-columns: 216px minmax(0, 1fr); }
+}
+/* 真窄（投屏小块 / 半屏窗口）：右栏折到下面一行，整页自己滚 */
+@media (max-width: 1060px) {
+  .task-page {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "hero" "main" "side";
+    height: auto;
+  }
+  .task-side { flex-direction: row; }
+  .task-side > .card { flex: 1; min-width: 0; }
+}
+
+/* 任务台右上角的留痕只是"顺带扫一眼"：一行一条，两行的话这卡里只塞得下三条，
+   一行能塞六七条，等于白捡一屏。 */
+.side-chain .chain-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+.side-chain .chain-row .top { flex: none; font-size: 12px; }
+.side-chain .chain-row .hash { margin: 0 0 0 auto; }
+.side-chain .chain-row::before { top: 50%; margin-top: -3.5px; }

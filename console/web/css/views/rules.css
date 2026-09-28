@@ -1,0 +1,147 @@
+/* 视图：规则库 —— 左：库状态 + 更新输出；右：定时更新 + NVD 密钥。
+   规则库是判断依据，所以版本、条数、更新时间必须一眼可见。 */
+
+.rules-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 348px;
+  gap: var(--sp-4);
+  height: 100%; min-height: 0;
+}
+.rules-split > .col { min-height: 0; }
+
+/* ── 四个库 ── */
+/* 固定 2x2：auto-fit 在这个宽度下会排成 3+1，第四张卡孤零零一行 */
+.rules-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+
+.rule-card {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background-color: var(--bg-2);
+  background-image: var(--surface-grad);
+  box-shadow: var(--hair);
+}
+.rule-card .head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.rule-card .name { font-size: 13.5px; font-weight: 600; }
+.rule-card .metric { display: flex; align-items: baseline; gap: 6px; margin: 7px 0 5px; }
+.rule-card .metric .v {
+  font-family: var(--mono); font-size: 21px; font-weight: 500;
+  letter-spacing: -.02em; line-height: 1.1;
+}
+.rule-card .metric .u { font-size: 11px; color: var(--text-3); }
+/* 体积 · 版本：一行放下两个字段，长版本号自己截断 */
+.rule-card .kv-row {
+  display: flex; align-items: baseline; gap: 5px;
+  padding: 2px 0; font-size: 11.5px; color: var(--text-3);
+}
+.rule-card .kv-row .v {
+  font-family: var(--mono); color: var(--text-2); min-width: 0;
+}
+.rule-card .kv-row .sep { color: var(--line-2); margin: 0 1px; }
+.rule-card .note {
+  font-size: 11px; color: var(--text-3); line-height: 1.55;
+  margin-top: 7px; padding-top: 7px;
+  border-top: 1px dashed var(--line);
+}
+
+/* ── 右列两张卡：定时卡按内容排，空白全给下面那张凭据卡 ──
+   两张都 flex:1 的话，定时卡在长屏上拖出一大块空白，矮屏（1366×768）上又会被压到
+   比内容还矮，自己顶上一条滚动条 —— 一张表单卡出现滚动条很怪。 */
+.sched-card { flex: none; }
+.cred-card { flex: 1; min-height: 0; }
+
+/* 保存按钮：原来是 ghost，跟卡片底色糊在一起，看着不像能点的东西。
+   这张卡里它是唯一"落笔"的动作，给它实体底色 + 一点立体感。 */
+.sched-save {
+  background-color: var(--bg-3);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, 0) 70%);
+  border-color: var(--line-2);
+  box-shadow: var(--hair), var(--shadow-sm);
+  color: var(--text);
+}
+.sched-save:hover:not(:disabled) {
+  background-color: var(--bg-4); border-color: #33445a;
+  box-shadow: var(--hair), 0 3px 10px rgba(0, 0, 0, .45);
+}
+.sched-save:active:not(:disabled) { box-shadow: var(--hair); }
+
+/* ── 更新输出：吃掉左列剩余高度，日志自己滚 ──
+   矮屏（1152×640 这类）上给它一个高度下限：不然上面那张规则库卡按内容长到 477px，
+   把这块压成 37px 塞不下任何东西；宁可让规则库卡自己内部滚。 */
+.update-card { flex: 1; min-height: 226px; }
+.update-body { display: flex; min-height: 0; }
+.update-body .log { flex: 1; min-height: 120px; }
+
+
+/* NVD 密钥行：输入框（通用组件）+ 保存/清除。 */
+.nvd-row { display: flex; align-items: center; gap: var(--sp-2); }
+.nvd-row .input { flex: 1; min-width: 0; }
+
+/* ── 更新输出的时间戳：落盘那份带时间，实时推的那份没有，所以留位不补 ── */
+.log .ts {
+  color: var(--text-3); margin-right: 8px;
+  user-select: none;                 /* 复制日志时别把时间一起带走 */
+}
+
+/* ── NVD 密钥已配置：输入框里摆的是占位圆点，不是明文 ── */
+.input.has-key { color: var(--text-3); letter-spacing: 2px; }
+/* 焦点时值已被让空，间距归位，别让提示样式挡住正常输入 */
+.input.has-key:focus { color: var(--text); letter-spacing: normal; }
+
+/* ── 放大的更新输出：小面板里翻长日志太难受，点"放大"给一整屏 ── */
+.log-zoom {
+  position: fixed; inset: 0; z-index: 60;
+  display: grid; place-items: center;
+  background: rgba(6, 9, 13, .72);
+  backdrop-filter: blur(2px);
+  padding: 3vh 3vw;
+}
+.zoom-panel {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; min-height: 0;
+  border: 1px solid var(--line-2); border-radius: var(--r-lg);
+  background: var(--bg-2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+  overflow: hidden;
+}
+.zoom-panel .card-head { flex: none; background: var(--bg-3); }
+.zoom-log {
+  flex: 1; min-height: 0; margin: var(--sp-3);
+  font-size: 12.5px; line-height: 1.75;
+}
+.zoom-log .ts { display: inline-block; width: 64px; }
+
+/* ── 库卡的骨架：扫目录要半秒，先把位置占住，避免"先看到更新输出、一两秒后
+      规则库才冒出来"这种跳版 ── */
+.rule-card.skeleton { display: flex; flex-direction: column; gap: 10px; }
+.sk {
+  height: 10px; border-radius: 5px;
+  background: linear-gradient(90deg, var(--bg-3) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-size: 200% 100%;
+  animation: sk 1.3s ease-in-out infinite;
+}
+.sk.big { height: 26px; }
+.sk.w40 { width: 40%; } .sk.w50 { width: 50%; }
+.sk.w60 { width: 60%; } .sk.w80 { width: 80%; }
+@keyframes sk { 0% { background-position: 120% 0; } 100% { background-position: -20% 0; } }
+
+/* ── 定时更新 ── */
+.sched-row { display: flex; align-items: center; gap: 8px; }
+/* 三档并排：天 / 小时 / 分钟。字段名放在各自上面一行 —— 比"每天 03 时 30 分"
+   这种字夹在中间、换行就错位的排法好扫。 */
+/* 子控件的个数跟着频率变（每分钟 1 个、每周 4 个），所以用可换行的 flex
+   而不是固定列数的 grid —— 多一个少一个都不会挤成一条。 */
+.sched-grid { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.sched-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 84px; min-width: 0; }
+.sched-field:first-child { flex: 1.6 1 110px; }
+.sched-field > span { font-size: 11px; color: var(--text-3); letter-spacing: .04em; }
+.sched-field select.input { padding: 6px 8px; font-family: var(--mono); font-size: 12px; }
+.sched-line { font-size: 11.5px; color: var(--text-3); }
+.sched-line b { color: var(--text-2); font-weight: 500; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips .chip {
+  cursor: pointer;
+  transition: border-color 130ms var(--ease), background 130ms var(--ease), color 130ms var(--ease);
+}
+.chips .chip:hover { border-color: var(--line-2); color: var(--text); }
+.chips .chip.on { border-color: var(--signal-line); background: var(--signal-dim); color: var(--signal); }
